@@ -1,0 +1,40 @@
+---
+title: "When the Code Starts Designing You"
+description: "Software does not just implement decisions. Over time, it changes which decisions a team can imagine making."
+date: "2026-08-31"
+tags: [Architecture, Programming, Product]
+category: "Architecture"
+author: "Shivansh Kumar"
+readingTime: "6 min read"
+published: true
+cover: "/covers/code-designing-you.png"
+---
+
+Developers design systems, but the influence does not travel in one direction. Once a system exists, it begins shaping the team that maintains it.
+
+A database schema turns a product idea into “too expensive.” A framework's folder structure becomes the company's architecture. An API created for one customer defines how future customers must behave. What began as implementation becomes a boundary around thought.
+
+## Defaults become decisions
+
+Framework conventions are useful because they remove choices. The danger appears when a default survives after its original context. Teams start defending it as a principle even though nobody remembers selecting it.
+
+Legacy systems influence planning in subtler ways. Product managers learn not to request certain changes. Engineers scope proposals around familiar modules. Eventually the roadmap reflects the easiest path through the codebase rather than the clearest expression of user need.
+
+## Notice constraint language
+
+Listen for sentences such as:
+
+- “The system cannot do that.”
+- “That field has to belong to an account.”
+- “Everything here must be synchronous.”
+- “We have always deployed these services together.”
+
+Some constraints are real. Others are old choices wearing the language of physics. Separate policy, implementation, and fundamental limitation before accepting “impossible.”
+
+## Recover design agency
+
+Use counterfactual design. Ask how the feature would work if the current system did not exist, then compare that clean model with the cost of adaptation. This prevents the implementation from defining the problem before the team has understood it.
+
+Create seams around the constraints that change most often. Translate old schemas into current domain language at boundaries. Measure the cost of workarounds so redesign can compete with feature work using evidence.
+
+We are always designing software under the influence of earlier software. Mature engineering is not freedom from constraints; it is knowing which constraints deserve authority. The system may shape our decisions, but it should not make them invisibly.

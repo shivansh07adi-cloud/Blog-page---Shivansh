@@ -1,0 +1,35 @@
+---
+title: "Retries Are Distributed Loops"
+description: "Why a harmless retry policy can amplify an outage—and how budgets, jitter, and idempotency keep recovery from becoming load."
+date: "2026-07-30"
+tags: [Systems, Cloud, Reliability]
+category: "Cloud"
+author: "Shivansh Kumar"
+readingTime: "6 min read"
+published: true
+cover: "/covers/retries-breathe-v3.png"
+---
+
+A retry is a loop whose iterations happen across time, machines, and failure domains. Treat it with the same suspicion you would give any unbounded loop.
+
+## The amplification problem
+
+Imagine three services in a chain. Each retries a failed downstream request three times. One user action can now create dozens of attempts precisely when the dependency is least able to serve them.
+
+```ts
+const delay = Math.min(cap, base * 2 ** attempt);
+const jitter = Math.random() * delay;
+await sleep(jitter);
+```
+
+## Give retries a budget
+
+A retry policy needs a deadline, a maximum attempt count, and a reason to believe the next attempt can succeed. Exponential backoff with jitter spreads callers out; it does not make an unhealthy dependency healthy.
+
+### Make operations idempotent
+
+If the client cannot tell whether the first attempt succeeded, repeating a write may duplicate it. An idempotency key lets the server recognize the logical operation across network attempts.
+
+## Recovery is a system property
+
+Retries, circuit breakers, load shedding, and timeouts must be designed together. Local resilience code can create global fragility when every layer makes the same optimistic decision.

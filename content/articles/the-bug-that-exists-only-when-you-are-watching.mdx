@@ -1,0 +1,45 @@
+---
+title: "The Bug That Exists Only When You're Watching"
+description: "Why race conditions disappear under a debugger—and how to investigate a system without changing its timing."
+date: "2026-08-30"
+tags: [Debugging, Concurrency, Systems]
+category: "Systems"
+author: "Shivansh Kumar"
+readingTime: "7 min read"
+published: true
+cover: "/covers/heisenbug-coffee-v2.png"
+---
+
+You attach a debugger and the failure disappears. You add logging and the test passes. You run the service locally a hundred times and see nothing, then production fails twice before lunch.
+
+This is not supernatural. It is a Heisenbug: observing the system changes the conditions that allow the bug to appear.
+
+## Observation has a cost
+
+Breakpoints suspend one thread while clocks, peers, and external services continue. Logging adds I/O, allocation, and synchronization. A debug build changes compiler optimization and memory layout. Even a metrics counter can alter contention on a hot path.
+
+When correctness depends on timing, these tiny changes can hide or reveal the failure.
+
+Common causes include unsynchronized shared state, missing memory barriers, assumptions about message order, reuse of mutable objects, timeout races, and cleanup that competes with in-flight work.
+
+## Capture evidence before interpretation
+
+Start by making the failure reproducible statistically, not perfectly. Record seeds, workload shape, machine information, and precise versions. Replace verbose logs with low-overhead structured events written to a bounded in-memory buffer. Preserve events from before the symptom, not only after it.
+
+Stress the suspected dimension deliberately:
+
+- vary CPU count and scheduler pressure;
+- inject latency at one boundary;
+- repeat with deterministic clocks or executors;
+- force unusual message ordering;
+- run race detectors where the platform supports them.
+
+Avoid adding arbitrary sleeps. They may move the race rather than explain it.
+
+## Fix the invariant
+
+A race-condition fix should state the broken rule: “state becomes visible before initialization completes” or “two workers may both claim the same job.” Then enforce that rule with ownership, immutability, atomic transitions, or explicit synchronization.
+
+The goal is not to make the bug disappear. It is to make the invalid state impossible.
+
+What if looking changes the bug? Then debugging must become experimental design. Control one variable, minimize observer effects, and collect enough evidence to explain why timing mattered. The elusive bug is often the system revealing that its real specification never included concurrency.

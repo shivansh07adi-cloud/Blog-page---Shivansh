@@ -1,0 +1,37 @@
+---
+title: "The Event Loop Is Not a Queue"
+description: "A field guide to tasks, microtasks, rendering, and the ordering assumptions that create wonderfully confusing bugs."
+date: "2026-08-21"
+tags: [Programming, Web, JavaScript]
+category: "Web"
+author: "Shivansh Kumar"
+readingTime: "7 min read"
+published: true
+cover: "/covers/event-loop-anime-v2.png"
+---
+
+“JavaScript is single-threaded” is true in the same way that “a restaurant has one cashier” is true: useful, incomplete, and a terrible model of the whole operation.
+
+## Several queues, one turn
+
+The browser coordinates task sources, microtasks, rendering opportunities, timers, and native subsystems. The event loop is the scheduling rule that decides when each kind of work gets its turn.
+
+```js
+console.log("A");
+setTimeout(() => console.log("B"), 0);
+Promise.resolve().then(() => console.log("C"));
+console.log("D");
+// A, D, C, B
+```
+
+## Microtasks can starve the page
+
+After a task completes, the runtime drains the microtask queue before the browser gets another rendering opportunity. A microtask that continually schedules another microtask can keep the page from painting.
+
+### Yield with intent
+
+Use a task boundary when the browser needs a chance to handle input or render. Use a microtask when a small piece of work must run before that next boundary.
+
+## The debugging habit
+
+When order matters, label the kind of work—not merely the callback. “This runs later” is not precise enough. Ask which queue owns it and what must drain first.

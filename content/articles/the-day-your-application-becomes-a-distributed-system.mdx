@@ -1,0 +1,40 @@
+---
+title: "The Day Your Application Becomes a Distributed System"
+description: "It happens earlier than you think: the moment correctness depends on two machines agreeing across an unreliable network."
+date: "2026-09-06"
+tags: [Systems, Architecture, Cloud]
+category: "Systems"
+author: "Shivansh Kumar"
+readingTime: "7 min read"
+published: true
+cover: "/covers/distributed-day.png"
+---
+
+You begin with one application. Then the database moves to another machine. Images go behind a CDN. Authentication comes from a provider. A queue handles email. Nothing feels like “distributed systems engineering,” yet a single request now crosses several failure domains.
+
+That is the day the application becomes distributed: not when it reaches a particular service count, but when correctness depends on components communicating through a network.
+
+## The network changes the meaning of failure
+
+Inside one process, a function either returns or throws. Across a network, silence is ambiguous. The request may never have arrived. It may have completed while the response was lost. The server may still be working. A timeout tells the caller to stop waiting; it does not reveal what happened.
+
+This ambiguity creates practical questions:
+
+- Is it safe to retry the operation?
+- Can the same event be processed twice?
+- What does the user see when one dependency is slow?
+- Which source wins when two copies disagree?
+
+## Distribution arrives by convenience
+
+Managed services make infrastructure easier to adopt, not logically local. Calling a payment API is still a distributed transaction even if its SDK looks like a normal method call. A cache is still another copy of data even if adding it took five lines.
+
+The danger is keeping a single-process mental model after the architecture has changed.
+
+## Design for partial success
+
+Start with deadlines rather than arbitrary timeouts. Give writes idempotency keys. Assume messages can be duplicated. Make state transitions observable. Decide which operations may degrade and which must fail closed. Trace a request across service boundaries using one correlation identifier.
+
+Most importantly, write down the ownership of truth. If the database, cache, and search index disagree, which one is authoritative and how are the others repaired?
+
+A simple app does not stop being simple because it has three servers. It stops being simple when the team can no longer explain its failure modes with a single timeline. Recognizing that transition early is not overengineering. It is admitting that distance, delay, and uncertainty are now part of the program.

@@ -1,0 +1,42 @@
+---
+title: "Software Rot: When Working Code Starts Dying"
+description: "A system can keep returning 200 OK while its ability to change quietly disappears."
+date: "2026-09-04"
+tags: [Maintenance, Architecture, Reliability]
+category: "Architecture"
+author: "Shivansh Kumar"
+readingTime: "6 min read"
+published: true
+cover: "/covers/software-rot.png"
+---
+
+Software does not rot like food. The bytes do not decay. A program left untouched can produce the same output years later—if its operating system, certificates, dependencies, APIs, data formats, and security assumptions also remain frozen. They never do.
+
+Rot is the growing distance between a system and the environment required to understand, operate, and safely change it.
+
+## A system can be alive and still be dying
+
+The dashboard is green. Customers can log in. Yet deployments require one particular engineer, tests fail randomly, the framework is unsupported, and a small change needs three weeks of regression checks. Runtime health hides development decay.
+
+Useful warning signs include:
+
+- recovery procedures that have not been exercised;
+- dependencies that cannot be upgraded independently;
+- tests that teams rerun until green;
+- undocumented manual steps in deployment;
+- modules everyone avoids touching;
+- lead time rising while feature size stays constant.
+
+These are not cosmetic problems. They measure the loss of optionality.
+
+## Maintenance must purchase confidence
+
+“Paying technical debt” is too vague to prioritize. Tie maintenance to a capability: upgrade the runtime so security patches remain available; isolate the payment adapter so the provider can change; replace flaky tests so failures carry information.
+
+Track outcomes such as deployment frequency, rollback time, dependency age, time to restore a development environment, and the number of people who can operate a critical path.
+
+## Keep the system changeable
+
+Schedule small, continuous repairs instead of rare cleanup seasons. Delete dead paths. Test backups by restoring them. Automate setup from an empty machine. Keep decision records close to the code. Give upgrades a regular budget before they become emergency projects.
+
+Working software is not merely software that runs today. It is software a team can still reason about tomorrow. Architectural life is the capacity to absorb change without fear becoming the primary design constraint.

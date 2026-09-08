@@ -1,0 +1,39 @@
+---
+title: "The Internet Is Built on Things Nobody Wants to Touch"
+description: "Why unglamorous legacy software survives—and why replacing it can be riskier than understanding it."
+date: "2026-09-05"
+tags: [Legacy, Systems, Reliability]
+category: "Systems"
+author: "Shivansh Kumar"
+readingTime: "7 min read"
+published: true
+cover: "/covers/legacy-internet.png"
+---
+
+Some of the most important software in the world is written in languages teams no longer teach, runs on hardware vendors barely advertise, and exposes interfaces nobody would design today. It persists not because engineers are careless, but because it has accumulated something new software does not possess: evidence.
+
+## Ugly can be proven
+
+A thirty-year-old system has survived real traffic, strange inputs, regulatory changes, hardware failures, and operators working at 3 a.m. Its design may be unpleasant, but its behavior is known. A replacement begins with cleaner abstractions and almost no operational history.
+
+The old system also contains invisible requirements. A report rounded in a peculiar way may feed a legal process. A fixed-width file may be consumed by a partner nobody remembered to interview. These contracts are rarely captured completely in documentation.
+
+## Rewrite risk is knowledge risk
+
+Teams often estimate a rewrite by counting features. That misses the harder inventory: exceptions, timing assumptions, operational habits, and downstream consumers. The code is only one part of the system. The people and procedures around it are part of the executable specification.
+
+This does not mean legacy systems should never change. It means “old” is not a diagnosis.
+
+## Modernize by reducing uncertainty
+
+A safer program begins at the boundary:
+
+1. Observe real inputs and outputs.
+2. Build characterization tests around behavior that matters.
+3. Place a stable interface in front of the legacy component.
+4. Replace narrow capabilities behind that interface.
+5. Compare old and new results before moving authority.
+
+This strangler approach looks slower than a clean rewrite during the first month. It is often faster by the second year because each step is reversible and produces information.
+
+Bad-looking software becomes difficult to replace when too much of the organization depends on behavior nobody has fully described. The responsible response is neither worship nor demolition. It is archaeology, containment, and gradual transfer of trust.

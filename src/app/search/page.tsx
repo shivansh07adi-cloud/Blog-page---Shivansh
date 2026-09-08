@@ -1,0 +1,3 @@
+import type {Metadata} from "next"; import {Suspense} from "react"; import {ArticleSearch} from "@/components/article-search"; import {getAllArticles} from "@/lib/articles";
+export const metadata:Metadata={title:"Search",description:"Search the complete Shivansh Kumar engineering journal.",alternates:{canonical:"/search"}};
+export default function SearchPage(){return <><header className="page-header"><div className="shell page-heading"><span className="section-kicker">Query the notebook</span><h1>Find a signal.</h1><p>Search every title, description, topic, tag, and article body in the journal.</p></div></header><Suspense><ArticleSearch articles={getAllArticles()}/></Suspense></>}

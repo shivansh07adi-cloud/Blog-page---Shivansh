@@ -1,0 +1,85 @@
+---
+title: "Your EC2 Instance Is Lying to You"
+description: "CPU says 20%. Memory looks comfortable. The application is still slow because host health and application health are different systems."
+date: "2026-09-08"
+tags: [AWS, EC2, Performance, Debugging]
+category: "Cloud"
+author: "Shivansh Kumar"
+readingTime: "9 min read"
+published: true
+cover: "/covers/aws-bill-story-v1.png"
+---
+
+The dashboard looks calm. CPU utilization hovers around 20 percent. Memory has room. The instance is passing its status checks.
+
+Users still wait three seconds for a page that used to load in three hundred milliseconds.
+
+The instance is not technically lying. It is answering a narrower question than the one you asked. “Is this machine consuming all of its CPU?” is not the same as “Can this application complete useful work quickly?”
+
+## Averages hide queues
+
+An instance-level CPU average can conceal a single saturated core. One busy event loop, lock-owning thread, or garbage-collection worker may become the throughput limit while the remaining cores are mostly idle.
+
+It can also conceal time. A one-minute graph smooths a ten-second saturation event that is long enough to ruin thousands of requests. Compare percentiles and short windows. Correlate request latency with run-queue length, per-core utilization, context switching, and garbage-collection pauses.
+
+Start with application symptoms: latency, error rate, throughput, and queue depth. Infrastructure metrics explain those symptoms; they should not replace them.
+
+## CPU you can borrow is not CPU you own
+
+T-family instances are burstable. They provide a baseline and use CPU credits to operate above it. When a Standard-mode instance exhausts accrued credits, performance moves back toward baseline. In Unlimited mode, it can continue using surplus credits and may incur additional charges when sustained usage stays above baseline ([AWS burstable instance concepts](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/burstable-credits-baseline-concepts.html)).
+
+This produces a classic pattern: the application is fast after a quiet period or restart, then slows under sustained load. CPU utilization alone does not tell the story. Inspect `CPUCreditBalance` and, where relevant, surplus-credit metrics. More importantly, ask whether the workload is actually bursty. A consistently busy service on a burstable instance is a mismatch disguised as savings.
+
+## The disk can throttle the application while CPU waits
+
+A thread waiting for storage does not look CPU-bound. EBS introduces limits at more than one layer: the volume has provisioned IOPS and throughput, while the EC2 instance type also has aggregate EBS bandwidth limits. Effective performance is constrained by the smaller limit ([AWS EBS performance guidance](https://docs.aws.amazon.com/ebs/latest/userguide/ebs-performance.html)).
+
+Watch queue length, operation latency, throughput, IOPS, and burst balance where applicable. Look inside the operating system too: I/O wait, filesystem latency, and database checkpoint behavior often explain a “quiet” CPU graph.
+
+Changing the volume may not help if the instance-level EBS channel is already the bottleneck. Resizing the instance may not help if the volume is under-provisioned. Performance work fails when it optimizes one side of a shared limit.
+
+## “Up to” network performance has a baseline
+
+Network capacity can be burstable as well. AWS notes that smaller instance sizes commonly advertise “up to” bandwidth, with baseline performance and a credit mechanism for temporary bursts. Packet-per-second and tracked-connection allowances can also limit achieved throughput before the headline bandwidth is reached ([AWS EC2 network bandwidth](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-network-bandwidth.html)).
+
+A service with many tiny requests may hit packet or connection-tracking pressure without moving an impressive number of gigabits. A proxy may exhaust ephemeral ports. A connection pool may serialize work behind a small limit. None of these failures require high CPU.
+
+Inspect retransmissions, connection setup time, socket states, packet rate, and the path beyond the instance. Sometimes the “EC2 problem” is a database connection limit or a downstream API whose latency keeps local workers occupied.
+
+## Memory “available” does not mean memory is irrelevant
+
+Memory graphs are easy to misread. Linux intentionally uses spare memory for cache. An application can have comfortable system memory while its own heap is fragmented, its garbage collector is pausing, or its container is approaching a stricter cgroup limit.
+
+Look for swap activity, page faults, reclaim pressure, out-of-memory events, heap growth, and pause duration. The useful question is not “Is memory at 100 percent?” It is “Is memory behavior delaying or killing useful work?”
+
+## Healthy hardware can host an unhealthy application
+
+The deepest trap is assuming that instance metrics contain the answer. The application may be waiting on:
+
+- a database lock;
+- an exhausted connection pool;
+- a downstream timeout;
+- a bounded worker queue;
+- DNS resolution;
+- a global mutex;
+- a slow cache miss;
+- a retry storm created elsewhere.
+
+Measure time at boundaries. Distributed traces, dependency latency, pool utilization, and queue depth reveal where a request spends its life. Compare a slow trace with a fast one instead of staring at unrelated averages.
+
+## A better investigation order
+
+When a healthy-looking instance serves a slow application, I work from the user inward:
+
+1. Define the affected operation and latency percentile.
+2. Identify whether time is spent running, waiting, or queued.
+3. Break the request into dependency spans.
+4. Inspect per-core CPU and credit balance.
+5. Check storage latency and both volume and instance limits.
+6. Check network packets, connections, retransmissions, and bandwidth allowances.
+7. Inspect pools, locks, queues, runtime pauses, and downstream limits.
+8. Change one constraint and verify the predicted effect.
+
+The EC2 instance is not lying. The dashboard is telling the truth about the measurements it has. The mistake is treating resource utilization as a complete model of performance.
+
+A server can be mostly idle because every request is waiting. Application health begins where the infrastructure graph stops.

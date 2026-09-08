@@ -1,0 +1,3 @@
+"use client";
+import {useRef,useState} from "react"; import type {HTMLAttributes} from "react";
+export function CodeBlock(props:HTMLAttributes<HTMLPreElement>){const ref=useRef<HTMLPreElement>(null);const [copied,setCopied]=useState(false);async function copy(){await navigator.clipboard.writeText(ref.current?.innerText??"");setCopied(true);setTimeout(()=>setCopied(false),1400)}return <div style={{position:"relative"}}><button onClick={copy} aria-label="Copy code" style={{position:"absolute",right:10,top:10,zIndex:2,border:"1px solid #3c4540",background:"#171c19",color:"#b9c2bc",padding:"6px 9px",font:"11px var(--font-geist-mono)",cursor:"pointer"}}>{copied?"COPIED":"COPY"}</button><pre ref={ref} {...props}/></div>}

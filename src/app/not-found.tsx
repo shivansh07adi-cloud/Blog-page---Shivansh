@@ -1,0 +1,2 @@
+import Link from "next/link"; import {ArrowRight} from "@/components/icons";
+export default function NotFound(){return <section className="not-found"><div><div className="not-found-code">404</div><h1>This page went deeper into the rabbit hole.</h1><p style={{color:"var(--muted)"}}>The reference exists somewhere. Just not at this address.</p><Link className="primary-link" href="/articles">Return to articles <ArrowRight/></Link></div></section>}

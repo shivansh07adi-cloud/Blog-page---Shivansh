@@ -1,0 +1,68 @@
+---
+title: "The Code Works. But Why?"
+description: "A practical argument for looking past green tests and learning to see the system your code is actually running inside."
+date: "2026-09-08"
+tags: [Programming, Systems, Debugging]
+category: "Systems"
+author: "Shivansh Kumar"
+readingTime: "8 min read"
+published: true
+featured: false
+cover: "/covers/code-works-anime-rotated-v3.png"
+---
+
+Working software is a milestone, not an explanation. The request returned `200`. The test suite is green. The graph is flat. None of those facts tell us why the system behaves correctly—or how close it is to behaving incorrectly.
+
+> The most expensive bugs often live in the distance between “it works” and “we know why it works.”
+
+## The abstraction bargain
+
+Every useful abstraction hides detail. That is its job. A database client hides wire protocols; a framework hides request lifecycles; a cloud service hides machines. We trade visibility for leverage.
+
+The bargain becomes dangerous when hidden detail turns into imaginary detail. We begin to explain a system using a mental model that is clean, plausible, and wrong.
+
+```ts
+const result = await cache.get(key);
+
+if (!result) {
+  return database.find(key);
+}
+```
+
+This looks simple. But what counts as “not found”? Can `result` be an empty string? How stale may it be? What happens when ten thousand callers miss simultaneously?
+
+## Trace the real path
+
+When behaviour surprises me, I write down the actual path an operation takes. Not the boxes from the architecture slide—the path through real processes, queues, network hops, and storage.
+
+### Start with one request
+
+Pick one representative request and attach evidence to every transition:
+
+1. What bytes entered the system?
+2. Which process received them?
+3. Where did state change?
+4. Which boundary introduced waiting or failure?
+
+| Boundary | Question | Evidence |
+| --- | --- | --- |
+| Browser → CDN | Was the response cached? | Response headers |
+| API → database | Which query ran? | Query log |
+| Worker → queue | Was delivery acknowledged? | Message ID |
+
+## Build mechanical sympathy
+
+You do not need to memorize an operating-system textbook before shipping a web app. You do need enough curiosity to notice when the abstraction leaks.
+
+Learn one layer below the one you use. If you write React, understand the browser event loop. If you use an ORM, read the generated SQL. If you deploy containers, learn what a process and a signal actually are.
+
+```bash
+curl -I https://example.com/api/health
+# Read the headers. They are part of the program too.
+```
+
+## A better definition of done
+
+“Done” does not mean understanding every transistor. It means your explanation matches the evidence at the level where your decisions are made.
+
+The code works. Good. Now ask the more valuable question.

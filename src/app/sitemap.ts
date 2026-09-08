@@ -1,0 +1,2 @@
+import type {MetadataRoute} from "next"; import {getAllArticles} from "@/lib/articles"; import {siteConfig} from "@/lib/site";
+export default function sitemap():MetadataRoute.Sitemap{const routes=["","/articles","/topics","/about"].map(route=>({url:`${siteConfig.url}${route}`,lastModified:new Date(),changeFrequency:"weekly" as const,priority:route===""?1:.8}));return [...routes,...getAllArticles().map(a=>({url:`${siteConfig.url}/articles/${a.slug}`,lastModified:new Date(a.date),changeFrequency:"monthly" as const,priority:.7}))]}

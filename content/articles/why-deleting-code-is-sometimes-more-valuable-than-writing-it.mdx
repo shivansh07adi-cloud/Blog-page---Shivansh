@@ -1,0 +1,44 @@
+---
+title: "Why Deleting Code Is Sometimes More Valuable Than Writing It"
+description: "Every maintained line carries cost. Removing the right ones can create more capacity than another feature."
+date: "2026-09-02"
+tags: [Programming, Maintenance, Architecture]
+category: "Programming"
+author: "Shivansh Kumar"
+readingTime: "6 min read"
+published: true
+cover: "/covers/deleting-code.png"
+---
+
+Code is usually presented as an asset: more features, more capability, more visible progress. But code is also inventory. Every line can contain an assumption, require a dependency, trigger a test, confuse a reader, or break during an upgrade.
+
+Deleting code is valuable when it removes obligations without removing outcomes.
+
+## Lines are not the unit of value
+
+Thirty thousand new lines might duplicate a platform capability. Thirty thousand deleted lines might retire a private framework, eliminate an entire deployment path, and shorten every future change.
+
+The useful question is not “How much code did we ship?” It is “What complexity must the team carry now?”
+
+## Deletion requires evidence
+
+Removing code safely is harder than selecting a folder and pressing Delete. First prove that the behavior is unused. Combine static references, runtime telemetry, access logs, feature flags, and conversations with owners. Watch for indirect consumers: scheduled jobs, exported data, old mobile clients, and manual support workflows.
+
+A reliable retirement sequence looks like this:
+
+1. Stop creating new dependencies on the path.
+2. Instrument its usage.
+3. Redirect or migrate remaining consumers.
+4. Disable it reversibly.
+5. Observe before permanent removal.
+6. Delete code, configuration, tests, alerts, and documentation together.
+
+Partial deletion leaves ghost systems that still demand attention.
+
+## Reward simplification
+
+Teams celebrate launches because they are visible. Make subtraction visible too. Record reduced build time, fewer alerts, lower infrastructure cost, smaller attack surface, and shorter onboarding paths.
+
+The best deletion changes the shape of future work. It makes an entire class of bugs impossible or turns a three-service change into a one-module edit.
+
+Software should be judged by the capability it provides, not the mass of its implementation. Writing code proves we can create a solution. Deleting code proves we understand which parts of the solution are actually necessary.
